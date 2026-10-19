@@ -1,0 +1,6 @@
+{
+  "name": "Nasty Pinball - Oriental Arcade Pinball",
+  "description": "Oriental-themed arcade pinball with 5 evolving stages (Neon, J-Horror, Samurai Sakura, Mecha Shinobi, Yokai), dynamic stage shapes, particle explosions, and reactive mascot scoreboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
