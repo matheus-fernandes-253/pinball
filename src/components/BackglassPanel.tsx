@@ -18,6 +18,7 @@ interface BackglassPanelProps {
   onToggleMute: () => void;
   onToggleMusic: () => void;
   onToggleCrt: () => void;
+  onToggleInfiniteLives: () => void;
 }
 
 export const BackglassPanel: React.FC<BackglassPanelProps> = ({
@@ -30,6 +31,7 @@ export const BackglassPanel: React.FC<BackglassPanelProps> = ({
   onToggleMute,
   onToggleMusic,
   onToggleCrt,
+  onToggleInfiniteLives,
 }) => {
   // Score progress toward next stage threshold
   const scoreProgress = Math.min(100, Math.max(0, Math.round((stats.score / stats.nextStageThreshold) * 100)));
@@ -183,13 +185,15 @@ export const BackglassPanel: React.FC<BackglassPanelProps> = ({
         </div>
       </div>
 
-      {/* 5. USER REQUEST: STAGE SELECTOR BUTTONS ON RIGHT LATERAL (Para validar qualquer fase) */}
+      {/* 5. USER REQUEST: STAGE SELECTOR & TEST VALIDATION (Vidas Infinitas & 5 Fases) */}
       <div className="my-2 p-2.5 rounded-xl border border-red-900/60 bg-slate-900/90 shadow-md">
         <div className="flex items-center justify-between text-xs font-mono font-bold text-amber-400 mb-2">
-          <span>MUDAR DE FASE (VALIDAÇÃO / TESTE)</span>
-          <span className="text-[10px] text-slate-400 font-normal">5 FASES DISPONÍVEIS</span>
+          <span>PAINEL DE TESTES & FASES</span>
+          <span className="text-[10px] text-slate-400 font-normal">VALIDAÇÃO RÁPIDA</span>
         </div>
-        <div className="grid grid-cols-5 gap-1.5">
+
+        {/* 5 Stage Switcher Buttons */}
+        <div className="grid grid-cols-5 gap-1.5 mb-2.5">
           {STAGES.map((stg) => {
             const isActive = stats.currentStage === stg.id;
             return (
@@ -206,7 +210,7 @@ export const BackglassPanel: React.FC<BackglassPanelProps> = ({
                 <span className="text-[10px] font-mono leading-none">FASE {stg.id}</span>
                 <span className="text-xs font-serif font-bold mt-0.5 leading-none">{stg.kanjiTitle.slice(0, 2)}</span>
                 <span className="text-[9px] font-mono opacity-80 uppercase leading-none mt-1">
-                  {stg.theme === 'neon' ? 'Neon' : stg.theme === 'jhorror' ? 'Terror' : stg.theme === 'samurai' ? 'Samurai' : stg.theme === 'shinobi' ? 'Shinobi' : 'Yokai'}
+                  {stg.theme === 'neon' ? 'Praia' : stg.theme === 'jhorror' ? 'Terror' : stg.theme === 'samurai' ? 'Samurai' : stg.theme === 'shinobi' ? 'Shinobi' : 'Yokai'}
                 </span>
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-white mt-1 shadow-sm animate-ping" />
@@ -214,6 +218,52 @@ export const BackglassPanel: React.FC<BackglassPanelProps> = ({
               </button>
             );
           })}
+        </div>
+
+        {/* Infinite Lives Toggle Option */}
+        <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+          <span className="text-[11px] font-mono text-slate-300 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>MODO DE TESTE:</span>
+          </span>
+          <button
+            onClick={onToggleInfiniteLives}
+            className={`px-3 py-1 rounded text-xs font-mono font-bold border transition-all flex items-center gap-1.5 ${
+              stats.infiniteLives
+                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]'
+                : 'bg-slate-950 text-slate-400 border-slate-700 hover:text-slate-200'
+            }`}
+            title="Alternar vidas infinitas para testes"
+          >
+            <span>♾️</span>
+            <span>{stats.infiniteLives ? 'VIDAS INFINITAS: LIGADO' : 'VIDAS PADRÃO (3)'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 5B. ACTIVE STAGE MISSION CARD */}
+      <div className="my-1 p-2.5 rounded-xl border border-amber-500/40 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-900 shadow-sm">
+        <div className="flex items-center justify-between text-[11px] font-mono mb-1">
+          <span className="text-amber-400 font-bold flex items-center gap-1">
+            <span>🎯</span>
+            <span>OBJETIVO / MISSÃO DA FASE</span>
+          </span>
+          <span
+            className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+              stats.missionCompleted
+                ? 'bg-emerald-950 text-emerald-300 border border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]'
+                : 'bg-amber-950/80 text-amber-300 border border-amber-600/60'
+            }`}
+          >
+            {stats.missionCompleted ? '★ CONCLUÍDA! ★' : stats.missionProgress || 'EM ANDAMENTO'}
+          </span>
+        </div>
+        <div className="text-xs font-mono text-slate-200 leading-snug">
+          {stageConfig.stageMission}
+        </div>
+        <div className="text-[10px] font-mono text-emerald-400 mt-1 flex items-center gap-1">
+          <span>RECOMPENSA:</span>
+          <span className="font-bold">{stageConfig.missionRewardText}</span>
         </div>
       </div>
 

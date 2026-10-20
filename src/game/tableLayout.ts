@@ -8,8 +8,8 @@ import { Vector2D, WallSegment, JetBumper, DropTarget, Slingshot, RolloverLane, 
 export const TABLE_WIDTH = 700;
 export const TABLE_HEIGHT = 960;
 export const BALL_RADIUS = 13.5;
-export const GRAVITY = 1150; // Pixels per sec^2 downwards incline
-export const MAX_BALL_SPEED = 2200; // Realistic terminal velocity cap for high-energy arcade launches
+export const GRAVITY = 920; // Decreased for smoother, more controllable ball acceleration (was 1150)
+export const MAX_BALL_SPEED = 1850; // Balanced terminal speed for fluid arcade reaction time (was 2200)
 
 export function createInitialFlippers(): { left: Flipper; right: Flipper } {
   return {
@@ -49,26 +49,29 @@ export function createInitialFlippers(): { left: Flipper; right: Flipper } {
 export const STAGES: StageConfig[] = [
   {
     id: 1,
-    name: 'STAGE 1: NEON ARCADE',
-    subtitle: 'Cyber 90s Akihabara Edition',
-    kanjiTitle: '電脳遊戯',
+    name: 'STAGE 1: BEACH BIKINI ARCADE',
+    subtitle: 'Summer High School Pixel Art Edition',
+    kanjiTitle: '常夏学園',
     scoreThreshold: 50000,
     theme: 'neon',
-    backglassImage: '/src/assets/images/anime_backglass_heroine_1792073461707.jpg',
-    mascotName: 'SAKURA',
+    backglassImage: '/src/assets/images/beach_anime_pixelart_1792443936790.jpg',
+    playfieldImage: '/src/assets/images/beach_anime_pixelart_1792443936790.jpg',
+    mascotName: 'SAKURA & AOI',
     bumperShape: 'circle',
     dropTargetLetters: ['N', 'E', 'O'],
     dropTargetColor: '#EC4899',
     slingshotColor: '#0284C7',
-    accentColor: '#06B6D4',
-    tableBgColor: '#0a0b1c',
+    accentColor: '#38BDF8',
+    tableBgColor: '#0b1928',
     tableFeltPattern: 'grid',
+    stageMission: 'Derrube os alvos N-E-O para iniciar a Festa na Praia!',
+    missionRewardText: 'BEACH PARTY 2X MULTIPLIER!',
     mascotQuotes: {
-      start: 'IKUZO! HIT 50,000 PTS TO CLEAR STAGE 1!',
-      combo: 'SUGOI! NEON COMBO STREAK!',
-      drain: "AHH! DON'T DRAIN THE BALL!",
-      multiball: '★ 3-BALL MULTIBALL FEVER! ★',
-      stageClear: 'STAGE 1 CLEARED! ENTERING J-HORROR...',
+      start: 'IKUZO! HIT 50,000 PTS TO CLEAR SUMMER STAGE!',
+      combo: 'YATTA! BEACH COMBO STREAK!',
+      drain: 'KYAA! WATCH OUT FOR THE WAVES!',
+      multiball: '★ 3-BALL BEACH PARTY MULTIBALL! ★',
+      stageClear: 'STAGE 1 CLEARED! HEADING TO J-HORROR SCHOOL...',
     },
   },
   {
@@ -79,6 +82,7 @@ export const STAGES: StageConfig[] = [
     scoreThreshold: 150000,
     theme: 'jhorror',
     backglassImage: '/src/assets/images/jhorror_backglass_art_1792338949512.jpg',
+    playfieldImage: '/src/assets/images/jhorror_playfield_1792458808970.jpg',
     mascotName: 'REIKO',
     bumperShape: 'cursed_eye',
     dropTargetLetters: ['呪', '怨', '死', '霊'],
@@ -87,6 +91,8 @@ export const STAGES: StageConfig[] = [
     accentColor: '#EF4444',
     tableBgColor: '#120508',
     tableFeltPattern: 'talismans',
+    stageMission: 'Exorcize os 4 Selos Ofuda (呪・怨・死・霊) da Sala!',
+    missionRewardText: 'CURSE EXORCISED! +50.000 PTS!',
     mascotQuotes: {
       start: 'THE SCHOOL IS HAUNTED... BREAK THE CURSE AT 150,000!',
       combo: 'THE SPIRITS AWAKEN... KEEP HITTING!',
@@ -103,6 +109,7 @@ export const STAGES: StageConfig[] = [
     scoreThreshold: 300000,
     theme: 'samurai',
     backglassImage: '/src/assets/images/samurai_backglass_art_1792338949761.jpg',
+    playfieldImage: '/src/assets/images/samurai_playfield_1792458810307.jpg',
     mascotName: 'TOMOE',
     bumperShape: 'sakura',
     dropTargetLetters: ['侍', '刀', '桜'],
@@ -111,6 +118,8 @@ export const STAGES: StageConfig[] = [
     accentColor: '#F59E0B',
     tableBgColor: '#180B0F',
     tableFeltPattern: 'sakura_petals',
+    stageMission: 'Acerte os 3 Rollovers do Castelo (櫻・武・士) para a Lâmina Sagrada!',
+    missionRewardText: 'SAMURAI BLADE FEVER! 3X MULTIPLIER!',
     mascotQuotes: {
       start: 'DRAW THY BLADE! REACH 300,000 FOR VICTORY!',
       combo: 'ONE STRIKE, ONE SCORE! EXCELLENT!',
@@ -127,6 +136,7 @@ export const STAGES: StageConfig[] = [
     scoreThreshold: 500000,
     theme: 'shinobi',
     backglassImage: '/src/assets/images/shinobi_backglass_art_1792338951047.jpg',
+    playfieldImage: '/src/assets/images/shinobi_playfield_1792458809537.jpg',
     mascotName: 'KASUMI',
     bumperShape: 'shuriken',
     dropTargetLetters: ['忍', '影', '斬', '刃'],
@@ -135,6 +145,8 @@ export const STAGES: StageConfig[] = [
     accentColor: '#38BDF8',
     tableBgColor: '#04101A',
     tableFeltPattern: 'circuits',
+    stageMission: 'Hackeie os terminais cibernéticos (忍・影・斬・刃) para Overdrive!',
+    missionRewardText: 'CYBER OVERDRIVE! +75.000 PTS!',
     mascotQuotes: {
       start: 'STEALTH PROTOCOL ENGAGED! TARGET: 500,000 PTS!',
       combo: 'SHURIKEN ACCURACY 100%!',
@@ -151,6 +163,7 @@ export const STAGES: StageConfig[] = [
     scoreThreshold: 1000000,
     theme: 'yokai',
     backglassImage: '/src/assets/images/yokai_backglass_art_1792338965836.jpg',
+    playfieldImage: '/src/assets/images/yokai_playfield_1792458809655.jpg',
     mascotName: 'AKANE',
     bumperShape: 'oni_skull',
     dropTargetLetters: ['鬼', '炎', '滅'],
@@ -159,6 +172,8 @@ export const STAGES: StageConfig[] = [
     accentColor: '#F97316',
     tableBgColor: '#1C0603',
     tableFeltPattern: 'magma',
+    stageMission: 'Destrua os 3 Selos Demoníacos (鬼・炎・滅) para o Jackpot do Submundo!',
+    missionRewardText: 'HELLFIRE JACKPOT! +150.000 PTS!',
     mascotQuotes: {
       start: 'FINAL APOCALYPSE! SURVIVE THE ONI QUEEN!',
       combo: 'INFERNO STRIKE! MAXIMUM DAMAGE!',
@@ -181,46 +196,46 @@ export function createBumpersForStage(stageId: number = 1): JetBumper[] {
   if (cfg.theme === 'jhorror') {
     // Stage 2 J-HORROR: 4 Cursed Eye Bumpers arranged in an occult diamond ritual
     return [
-      { id: 1, x: 350, y: 245, radius: 34, score: 700, lit: false, hitTimer: 0, color: '#EF4444' },
-      { id: 2, x: 250, y: 335, radius: 34, score: 700, lit: false, hitTimer: 0, color: '#DC2626' },
-      { id: 3, x: 450, y: 335, radius: 34, score: 700, lit: false, hitTimer: 0, color: '#DC2626' },
-      { id: 4, x: 350, y: 425, radius: 36, score: 1200, lit: false, hitTimer: 0, color: '#B91C1C' },
+      { id: 1, x: 250, y: 220, radius: 32, score: 700, lit: false, hitTimer: 0, color: '#EF4444' },
+      { id: 2, x: 440, y: 220, radius: 32, score: 700, lit: false, hitTimer: 0, color: '#DC2626' },
+      { id: 3, x: 345, y: 310, radius: 38, score: 1000, lit: false, hitTimer: 0, color: '#DC2626' },
+      { id: 4, x: 345, y: 430, radius: 34, score: 1500, lit: false, hitTimer: 0, color: '#B91C1C' },
     ];
   }
 
   if (cfg.theme === 'samurai') {
     // Stage 3 SAMURAI: 3 Sakura Blossom Crest Bumpers in a broad defensive arc
     return [
-      { id: 1, x: 240, y: 305, radius: 38, score: 800, lit: false, hitTimer: 0, color: '#FB7185' },
-      { id: 2, x: 350, y: 245, radius: 42, score: 1500, lit: false, hitTimer: 0, color: '#F59E0B' },
-      { id: 3, x: 460, y: 305, radius: 38, score: 800, lit: false, hitTimer: 0, color: '#FB7185' },
+      { id: 1, x: 220, y: 290, radius: 38, score: 800, lit: false, hitTimer: 0, color: '#FB7185' },
+      { id: 2, x: 350, y: 230, radius: 44, score: 1800, lit: false, hitTimer: 0, color: '#F59E0B' },
+      { id: 3, x: 480, y: 290, radius: 38, score: 800, lit: false, hitTimer: 0, color: '#FB7185' },
     ];
   }
 
   if (cfg.theme === 'shinobi') {
-    // Stage 4 MECHA SHINOBI: 4 Shuriken Star Bumpers in stealth corridor pairs
+    // Stage 4 MECHA SHINOBI: 4 Shuriken Star Bumpers in stealth corridor zig-zag
     return [
-      { id: 1, x: 265, y: 260, radius: 35, score: 1000, lit: false, hitTimer: 0, color: '#06B6D4' },
-      { id: 2, x: 435, y: 260, radius: 35, score: 1000, lit: false, hitTimer: 0, color: '#06B6D4' },
-      { id: 3, x: 290, y: 395, radius: 35, score: 1200, lit: false, hitTimer: 0, color: '#38BDF8' },
-      { id: 4, x: 410, y: 395, radius: 35, score: 1200, lit: false, hitTimer: 0, color: '#38BDF8' },
+      { id: 1, x: 230, y: 250, radius: 34, score: 1000, lit: false, hitTimer: 0, color: '#06B6D4' },
+      { id: 2, x: 470, y: 250, radius: 34, score: 1000, lit: false, hitTimer: 0, color: '#06B6D4' },
+      { id: 3, x: 310, y: 370, radius: 36, score: 1500, lit: false, hitTimer: 0, color: '#38BDF8' },
+      { id: 4, x: 390, y: 370, radius: 36, score: 1500, lit: false, hitTimer: 0, color: '#38BDF8' },
     ];
   }
 
   if (cfg.theme === 'yokai') {
-    // Stage 5 YOKAI ONI: 3 Inferno Demon Bumpers featuring a massive center Boss Core
+    // Stage 5 YOKAI ONI: 3 Inferno Demon Bumpers featuring a massive center Boss Skull Core
     return [
-      { id: 1, x: 220, y: 290, radius: 34, score: 1500, lit: false, hitTimer: 0, color: '#F97316' },
-      { id: 2, x: 350, y: 335, radius: 46, score: 3000, lit: false, hitTimer: 0, color: '#EF4444' },
-      { id: 3, x: 480, y: 290, radius: 34, score: 1500, lit: false, hitTimer: 0, color: '#FBBF24' },
+      { id: 1, x: 210, y: 270, radius: 36, score: 2000, lit: false, hitTimer: 0, color: '#F97316' },
+      { id: 2, x: 350, y: 330, radius: 50, score: 5000, lit: false, hitTimer: 0, color: '#EF4444' },
+      { id: 3, x: 490, y: 270, radius: 36, score: 2000, lit: false, hitTimer: 0, color: '#FBBF24' },
     ];
   }
 
-  // Stage 1 NEON: 3 classic glowing round bumpers in inverted triangle
+  // Stage 1 NEON BEACH: 3 classic glowing round beach ball bumpers
   return [
-    { id: 1, x: 270, y: 290, radius: 36, score: 500, lit: false, hitTimer: 0, color: '#EC4899' },
-    { id: 2, x: 430, y: 290, radius: 36, score: 500, lit: false, hitTimer: 0, color: '#06B6D4' },
-    { id: 3, x: 350, y: 400, radius: 38, score: 1000, lit: false, hitTimer: 0, color: '#FBBF24' },
+    { id: 1, x: 260, y: 280, radius: 36, score: 500, lit: false, hitTimer: 0, color: '#EC4899' },
+    { id: 2, x: 440, y: 280, radius: 36, score: 500, lit: false, hitTimer: 0, color: '#06B6D4' },
+    { id: 3, x: 350, y: 395, radius: 38, score: 1000, lit: false, hitTimer: 0, color: '#FBBF24' },
   ];
 }
 
@@ -336,8 +351,8 @@ export function createSlingshots(): Slingshot[] {
   ];
 }
 
-// Generate fully sealed perimeter walls, plunger lane, arch, and in/outlanes
-export function createTableWalls(): WallSegment[] {
+// Generate fully sealed perimeter walls, plunger lane, arch, and stage-specific interior geometry
+export function createWallsForStage(stageId: number = 1): WallSegment[] {
   const walls: WallSegment[] = [];
 
   function addSegment(x1: number, y1: number, x2: number, y2: number, restitution = 0.6, friction = 0.08, isGate = false) {
@@ -360,11 +375,8 @@ export function createTableWalls(): WallSegment[] {
   }
 
   // 1. Plunger Lane (Right edge)
-  // Outer right wall from bottom to top arch start
   addSegment(665, 930, 665, 230, 0.55);
-  // Bottom bumper stop of plunger lane
   addSegment(620, 930, 665, 930, 0.4);
-  // Plunger lane inner wall separating lane from playfield
   addSegment(620, 255, 620, 930, 0.55);
 
   // 2. Continuous Top Arch (Smooth 16-segment dome enclosing the top)
@@ -389,10 +401,10 @@ export function createTableWalls(): WallSegment[] {
     addSegment(arch[i].x, arch[i].y, arch[i + 1].x, arch[i + 1].y, 0.72, 0.01);
   }
 
-  // 3. One-way Gate at top of plunger lane (allows ball to exit lane, blocks return)
+  // 3. One-way Gate at top of plunger lane
   addSegment(665, 240, 620, 240, 0.4, 0.05, true);
 
-  // 4. Left Outer Wall (down to left inlane/outlane entrance)
+  // 4. Left Outer Wall
   addSegment(35, 230, 35, 690, 0.6);
 
   // 5. Left Outlane Outer Guide
@@ -423,15 +435,46 @@ export function createTableWalls(): WallSegment[] {
   addSegment(305, 75, 305, 170, 0.55);
   addSegment(395, 75, 395, 170, 0.55);
 
-  // 12. Upper Orbit Deflectors (prevent ball from getting trapped in top corners)
-  addSegment(105, 190, 180, 150, 0.6);
-  addSegment(520, 150, 595, 190, 0.6);
-
-  // 13. Ball Lock Scoop Left Guide Walls
+  // 12. Ball Lock Scoop Left Guide Walls
   addSegment(35, 330, 85, 330, 0.55);
   addSegment(85, 330, 105, 360, 0.55);
 
+  // 13. STAGE-SPECIFIC INTERIOR OBSTACLES & GEOMETRY
+  if (stageId === 2) {
+    // Stage 2 J-HORROR: Asymmetrical haunted school hallway & spirit alcove
+    addSegment(315, 280, 375, 280, 0.7); // Cursed classroom desk barrier
+    addSegment(480, 350, 535, 400, 0.65); // Jagged haunted locker
+    addSegment(535, 400, 505, 460, 0.65);
+    addSegment(110, 190, 185, 150, 0.6);
+  } else if (stageId === 3) {
+    // Stage 3 SAMURAI: Dual Pagoda Eaves and Torii Gate funnel
+    addSegment(130, 240, 210, 200, 0.68); // Left Pagoda roof
+    addSegment(490, 200, 570, 240, 0.68); // Right Pagoda roof
+    addSegment(165, 570, 200, 625, 0.6);  // Katana deflection rail left
+    addSegment(535, 570, 500, 625, 0.6);  // Katana deflection rail right
+  } else if (stageId === 4) {
+    // Stage 4 MECHA SHINOBI: Cyberpunk twin vertical high-speed circuit rails
+    addSegment(215, 305, 215, 435, 0.75); // Left cyber rail
+    addSegment(485, 305, 485, 435, 0.75); // Right cyber rail
+    addSegment(320, 230, 380, 230, 0.7);  // Center ninja leap deflector
+  } else if (stageId === 5) {
+    // Stage 5 YOKAI ONI: Magma funnel cracks & Demon Hellgate baffle
+    addSegment(140, 350, 225, 440, 0.7); // Left magma crag
+    addSegment(560, 350, 475, 440, 0.7); // Right magma crag
+    addSegment(300, 530, 400, 530, 0.75); // Hellgate cross baffle
+    addSegment(105, 190, 180, 150, 0.6);
+    addSegment(520, 150, 595, 190, 0.6);
+  } else {
+    // Stage 1 BEACH: Smooth open-orbit corner deflectors
+    addSegment(105, 190, 180, 150, 0.6);
+    addSegment(520, 150, 595, 190, 0.6);
+  }
+
   return walls;
+}
+
+export function createTableWalls(): WallSegment[] {
+  return createWallsForStage(1);
 }
 
 // Wireform Ramp Path

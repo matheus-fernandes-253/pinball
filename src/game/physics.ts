@@ -74,7 +74,7 @@ export class PinballPhysics {
           // Strong launch up to -2000 px/s at 100% tension to cleanly summit the top arch
           ball.vy = -1250 - power * 800;
           ball.vx = 0;
-          soundEngine.playPlungerLaunch(power);
+          soundEngine.playPlungerLaunch(power, stats.currentStage);
           stats.skillShotReady = true;
           this.addParticles(ball.x, ball.y, 12, '#F59E0B');
           break;
@@ -506,7 +506,7 @@ export class PinballPhysics {
       this.cameraShake = Math.max(0, this.cameraShake - clampedDt * 18);
     }
 
-    // Drop target bank reset logic
+    // Drop target bank reset logic & Stage Missions
     const allTargetsDown = dropTargets.every((t) => t.isDown);
     if (allTargetsDown) {
       let readyToReset = true;
@@ -519,14 +519,62 @@ export class PinballPhysics {
           t.isDown = false;
           t.downTimer = 0;
         });
-        soundEngine.playBankReset();
-        stats.multiplier = Math.min(5, stats.multiplier + 1);
-        onScore(25000);
-        this.addPopup(`BANK RESET! ${stats.multiplier}X MULTI!`, 140, 440, '#10B981');
-        this.triggerBankResetCelebration(140, 440);
-        stats.mascotMood = 'HAPPY';
-        stats.mascotMessage = 'SUGOI! COMBO MULTIPLIER UP!';
-        stats.mascotTimer = 2.0;
+
+        // Stage-Specific Mission Completions & Progression Rewards
+        if (stats.currentStage === 1) {
+          stats.multiplier = Math.min(5, stats.multiplier + 1);
+          stats.missionCompleted = true;
+          stats.missionProgress = '100% - CONCLUÍDA!';
+          onScore(30000);
+          soundEngine.playMissionComplete();
+          this.addPopup('🏖️ BEACH PARTY! 2X MULTI! +30K', TABLE_WIDTH / 2, 400, '#38BDF8');
+          this.triggerStageClearExplosion('#38BDF8');
+          stats.mascotMood = 'HAPPY';
+          stats.mascotMessage = 'YATTA! BEACH PARTY MULTIPLIER UP!';
+          stats.mascotTimer = 2.5;
+        } else if (stats.currentStage === 2) {
+          stats.multiplier = Math.min(5, stats.multiplier + 1);
+          stats.missionCompleted = true;
+          stats.missionProgress = '100% - EXORCIZADO!';
+          onScore(50000);
+          soundEngine.playMissionComplete();
+          this.addPopup('👻 CURSE EXORCISED! +50K', TABLE_WIDTH / 2, 400, '#EF4444');
+          this.triggerStageClearExplosion('#EF4444');
+          stats.mascotMood = 'EXCITED';
+          stats.mascotMessage = 'THE SPIRITS ARE PURIFIED!';
+          stats.mascotTimer = 2.5;
+        } else if (stats.currentStage === 4) {
+          stats.multiplier = Math.min(5, stats.multiplier + 1);
+          stats.missionCompleted = true;
+          stats.missionProgress = '100% - OVERDRIVE!';
+          onScore(75000);
+          soundEngine.playMissionComplete();
+          this.addPopup('⚡ CYBER OVERDRIVE! +75K', TABLE_WIDTH / 2, 400, '#06B6D4');
+          this.triggerStageClearExplosion('#06B6D4');
+          stats.mascotMood = 'FEVER';
+          stats.mascotMessage = 'CYBER SYSTEM OVERDRIVE ACTIVE!';
+          stats.mascotTimer = 2.5;
+        } else if (stats.currentStage === 5) {
+          stats.multiplier = Math.min(5, stats.multiplier + 2);
+          stats.missionCompleted = true;
+          stats.missionProgress = '100% - JACKPOT!';
+          onScore(150000);
+          soundEngine.playMissionComplete();
+          this.addPopup('👹 DEMONIC JACKPOT! +150K', TABLE_WIDTH / 2, 400, '#F97316');
+          this.triggerStageClearExplosion('#F97316');
+          stats.mascotMood = 'FEVER';
+          stats.mascotMessage = 'ONI QUEEN SEALS SHATTERED!';
+          stats.mascotTimer = 3.0;
+        } else {
+          soundEngine.playBankReset();
+          stats.multiplier = Math.min(5, stats.multiplier + 1);
+          onScore(25000);
+          this.addPopup(`BANK RESET! ${stats.multiplier}X MULTI!`, 140, 440, '#10B981');
+          this.triggerBankResetCelebration(140, 440);
+          stats.mascotMood = 'HAPPY';
+          stats.mascotMessage = 'SUGOI! COMBO MULTIPLIER UP!';
+          stats.mascotTimer = 2.0;
+        }
       }
     }
 
@@ -573,10 +621,10 @@ export class PinballPhysics {
           continue;
         }
 
-        // 2. Integration: Gravity and Resistance
+        // 2. Integration: Gravity and Resistance (softened acceleration for better control)
         ball.vy += GRAVITY * subDt;
-        ball.vx *= 0.99988;
-        ball.vy *= 0.99988;
+        ball.vx *= 0.99972;
+        ball.vy *= 0.99972;
 
         // Terminal velocity clamp
         const speed = Math.hypot(ball.vx, ball.vy);
@@ -667,8 +715,8 @@ export class PinballPhysics {
 
             const normalVel = ball.vx * nx + ball.vy * ny;
             if (normalVel < 0) {
-              // Active repulsion impulse
-              const kickSpeed = -normalVel * 1.35 + 280;
+              // Active repulsion impulse (moderated for balanced acceleration)
+              const kickSpeed = -normalVel * 1.18 + 220;
               ball.vx += nx * kickSpeed;
               ball.vy += ny * kickSpeed;
 
@@ -716,7 +764,7 @@ export class PinballPhysics {
 
             const vDotN = ball.vx * nx + ball.vy * ny;
             if (vDotN < 0) {
-              const kick = -vDotN * sling.restitution + 260;
+              const kick = -vDotN * sling.restitution + 200;
               ball.vx += nx * kick;
               ball.vy += ny * kick;
 
@@ -778,10 +826,23 @@ export class PinballPhysics {
 
               if (rollovers.every((l) => l.lit)) {
                 rollovers.forEach((l) => (l.lit = false));
-                soundEngine.playBankReset();
-                stats.multiplier = Math.min(5, stats.multiplier + 1);
-                onScore(15000);
-                this.addPopup(`ALL LANES! ${stats.multiplier}X`, TABLE_WIDTH / 2, 120, '#F59E0B');
+                if (stats.currentStage === 3) {
+                  stats.multiplier = Math.min(5, stats.multiplier + 2);
+                  stats.missionCompleted = true;
+                  stats.missionProgress = '100% - CONCLUÍDA!';
+                  onScore(50000);
+                  soundEngine.playMissionComplete();
+                  this.addPopup('⚔️ SAMURAI BLADE FEVER! 3X! +50K', TABLE_WIDTH / 2, 120, '#F59E0B');
+                  this.triggerStageClearExplosion('#F59E0B');
+                  stats.mascotMood = 'EXCITED';
+                  stats.mascotMessage = 'THE SACRED BLADE HAS AWAKENED!';
+                  stats.mascotTimer = 2.5;
+                } else {
+                  soundEngine.playBankReset();
+                  stats.multiplier = Math.min(5, stats.multiplier + 1);
+                  onScore(15000);
+                  this.addPopup(`ALL LANES! ${stats.multiplier}X`, TABLE_WIDTH / 2, 120, '#F59E0B');
+                }
               }
             }
           }

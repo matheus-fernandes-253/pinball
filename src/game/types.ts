@@ -139,6 +139,7 @@ export interface StageConfig {
   scoreThreshold: number;
   theme: 'neon' | 'jhorror' | 'samurai' | 'shinobi' | 'yokai';
   backglassImage: string;
+  playfieldImage?: string;
   mascotName: string;
   bumperShape: BumperShapeType;
   dropTargetLetters: string[];
@@ -147,6 +148,8 @@ export interface StageConfig {
   accentColor: string;
   tableBgColor: string;
   tableFeltPattern: string;
+  stageMission: string;
+  missionRewardText: string;
   mascotQuotes: {
     start: string;
     combo: string;
@@ -171,6 +174,10 @@ export interface GameStats {
   tiltWarnings: number;
   isTilted: boolean;
   skillShotReady: boolean;
+  infiniteLives: boolean; // Infinite lives toggle for testing & casual play
+  stageMission: string;
+  missionProgress: string;
+  missionCompleted: boolean;
   mascotMood: MascotMood;
   mascotMessage: string;
   mascotTimer: number;

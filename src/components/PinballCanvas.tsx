@@ -47,13 +47,17 @@ export const PinballCanvas: React.FC<PinballCanvasProps> = ({
   const playfieldImgRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    // Load generated playfield art asset
+    // Load generated playfield art asset dynamically based on stageConfig
+    if (!stageConfig.playfieldImage) {
+      playfieldImgRef.current = null;
+      return;
+    }
     const img = new Image();
-    img.src = '/src/assets/images/pinball_playfield_art_1792073461455.jpg';
+    img.src = stageConfig.playfieldImage;
     img.onload = () => {
       playfieldImgRef.current = img;
     };
-  }, []);
+  }, [stageConfig.playfieldImage, stageConfig.id]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -64,6 +68,7 @@ export const PinballCanvas: React.FC<PinballCanvasProps> = ({
     let animId: number;
 
     const render = () => {
+      const now = performance.now() * 0.001;
       ctx.save();
 
       // Camera Shake
@@ -73,136 +78,142 @@ export const PinballCanvas: React.FC<PinballCanvasProps> = ({
         ctx.translate(shakeX, shakeY);
       }
 
-      // 1. Draw Playfield Base & Stage-Specific Themed Texture
+      // 1. Draw Playfield Base & Pixel Art Background Decal
       ctx.fillStyle = stageConfig.tableBgColor;
       ctx.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
 
-      if (stageConfig.theme === 'neon') {
-        if (playfieldImgRef.current) {
-          ctx.globalAlpha = 0.45;
-          ctx.drawImage(playfieldImgRef.current, 0, 0, TABLE_WIDTH, TABLE_HEIGHT);
-          ctx.globalAlpha = 1.0;
-        }
+      if (playfieldImgRef.current) {
+        ctx.save();
+        ctx.imageSmoothingEnabled = false; // Crisp 16-bit retro arcade aesthetic
+        ctx.globalAlpha = 0.62;
+        ctx.drawImage(playfieldImgRef.current, 0, 0, TABLE_WIDTH, TABLE_HEIGHT);
+        ctx.restore();
+      }
 
-        // Neon grid lines
-        ctx.strokeStyle = 'rgba(147, 51, 234, 0.15)';
-        ctx.lineWidth = 1;
-        for (let y = 0; y < TABLE_HEIGHT; y += 40) {
+      // 1B. DISTINCTIVE CREATIVE ANIMATIONS PER STAGE
+      if (stageConfig.theme === 'neon') {
+        // Stage 1 BEACH BIKINI: Animated ocean wave caustics & sparkling sunlight
+        ctx.save();
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.28)';
+        ctx.lineWidth = 1.5;
+        for (let i = 0; i < 4; i++) {
           ctx.beginPath();
-          ctx.moveTo(35, y);
-          ctx.lineTo(665, y);
+          const waveY = 780 + i * 28;
+          for (let x = 40; x <= 610; x += 20) {
+            const yOffset = Math.sin(x * 0.02 + now * 2.5 + i) * 6;
+            if (x === 40) ctx.moveTo(x, waveY + yOffset);
+            else ctx.lineTo(x, waveY + yOffset);
+          }
           ctx.stroke();
         }
-      } else if (stageConfig.theme === 'jhorror') {
-        // J-Horror Haunted School: Blood splatters & floating Ofuda Talismans
-        ctx.fillStyle = '#0f0305';
-        ctx.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
-
-        // Ominous crimson vignette
-        const darkGrad = ctx.createRadialGradient(TABLE_WIDTH / 2, 400, 100, TABLE_WIDTH / 2, 400, 500);
-        darkGrad.addColorStop(0, 'rgba(220, 38, 38, 0.12)');
-        darkGrad.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
-        ctx.fillStyle = darkGrad;
-        ctx.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
-
-        // Paper Talismans (Ofuda) scattered on table
-        const talismans = [
-          { x: 180, y: 220, rot: -0.2, text: '呪' },
-          { x: 500, y: 240, rot: 0.15, text: '怨' },
-          { x: 350, y: 550, rot: -0.08, text: '封' },
-          { x: 140, y: 620, rot: 0.25, text: '滅' },
-          { x: 540, y: 600, rot: -0.18, text: '霊' },
-        ];
-        talismans.forEach((t) => {
-          ctx.save();
-          ctx.translate(t.x, t.y);
-          ctx.rotate(t.rot);
-          ctx.fillStyle = '#FEF3C7';
-          ctx.fillRect(-18, -32, 36, 64);
-          ctx.strokeStyle = '#B45309';
-          ctx.lineWidth = 1.5;
-          ctx.strokeRect(-18, -32, 36, 64);
-
-          ctx.fillStyle = '#DC2626';
-          ctx.font = 'bold 22px "Noto Sans JP", sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(t.text, 0, 0);
-          ctx.restore();
-        });
-      } else if (stageConfig.theme === 'samurai') {
-        // Samurai Cherry Blossom: Lacquer wood, Torii gate silhouette & falling sakura petals
-        ctx.fillStyle = '#16080b';
-        ctx.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
-
-        // Torii Gate crest at top
-        ctx.strokeStyle = 'rgba(244, 63, 94, 0.25)';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(250, 90);
-        ctx.lineTo(450, 90);
-        ctx.moveTo(270, 75);
-        ctx.lineTo(430, 75);
-        ctx.moveTo(290, 75);
-        ctx.lineTo(290, 160);
-        ctx.moveTo(410, 75);
-        ctx.lineTo(410, 160);
-        ctx.stroke();
-
-        // Sakura Petals
-        const petals = [
-          { x: 180, y: 250, r: 12, rot: 0.4 },
-          { x: 490, y: 320, r: 14, rot: 1.1 },
-          { x: 280, y: 520, r: 10, rot: 0.8 },
-          { x: 420, y: 600, r: 13, rot: 2.1 },
-          { x: 350, y: 720, r: 11, rot: 1.5 },
-        ];
-        petals.forEach((p) => {
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-          ctx.fillStyle = 'rgba(251, 113, 133, 0.45)';
+        // Floating sunbeam sparkles
+        for (let s = 0; s < 7; s++) {
+          const sx = 100 + (s * 85 + Math.sin(now * 1.5 + s) * 20) % 480;
+          const sy = 160 + (s * 75 + Math.cos(now * 2 + s) * 25) % 450;
+          const sAlpha = 0.3 + 0.45 * Math.sin(now * 3 + s);
+          ctx.fillStyle = `rgba(253, 224, 71, ${Math.max(0, sAlpha)})`;
           ctx.beginPath();
-          ctx.ellipse(0, 0, p.r, p.r * 0.55, 0, 0, Math.PI * 2);
+          ctx.arc(sx, sy, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      } else if (stageConfig.theme === 'jhorror') {
+        // Stage 2 J-HORROR: Floating Will-o'-the-Wisps (Hitodama) & glowing Ofudas
+        ctx.save();
+        for (let g = 0; g < 4; g++) {
+          const gx = 180 + g * 110 + Math.sin(now * 1.6 + g * 1.5) * 25;
+          const gy = 820 - ((now * 45 + g * 190) % 760);
+          const gAlpha = 0.35 + 0.35 * Math.sin(now * 2.5 + g);
+
+          const grad = ctx.createRadialGradient(gx, gy, 2, gx, gy, 26);
+          grad.addColorStop(0, `rgba(56, 189, 248, ${gAlpha})`);
+          grad.addColorStop(0.5, `rgba(168, 85, 247, ${gAlpha * 0.5})`);
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(gx, gy, 26, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(gx, gy, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      } else if (stageConfig.theme === 'samurai') {
+        // Stage 3 SAMURAI: Swirling falling pink sakura petals
+        ctx.save();
+        for (let p = 0; p < 18; p++) {
+          const px = ((p * 42 + now * 35) % 580) + 40;
+          const py = ((p * 55 + now * 65 + Math.sin(p + now) * 25) % 880);
+          const prot = p + now * (1.2 + (p % 3) * 0.4);
+          ctx.save();
+          ctx.translate(px, py);
+          ctx.rotate(prot);
+          ctx.fillStyle = p % 2 === 0 ? 'rgba(251, 113, 133, 0.65)' : 'rgba(244, 63, 94, 0.55)';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 8, 4.5, 0, 0, Math.PI * 2);
           ctx.fill();
           ctx.restore();
-        });
-      } else if (stageConfig.theme === 'shinobi') {
-        // Mecha Shinobi: High-tech teal circuit lines & geometric ninja patterns
-        ctx.fillStyle = '#030c14';
-        ctx.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
-
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)';
-        ctx.lineWidth = 1.5;
-        // Cyber circuit tracks
-        for (let x = 80; x < TABLE_WIDTH - 80; x += 90) {
-          ctx.beginPath();
-          ctx.moveTo(x, 100);
-          ctx.lineTo(x, 400);
-          ctx.lineTo(x + 40, 440);
-          ctx.lineTo(x + 40, 750);
-          ctx.stroke();
         }
+        ctx.restore();
+      } else if (stageConfig.theme === 'shinobi') {
+        // Stage 4 MECHA SHINOBI: Digital laser scanline sweep & glowing circuit data packets
+        ctx.save();
+        const scanY = (now * 240) % TABLE_HEIGHT;
+        const scanGrad = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 8);
+        scanGrad.addColorStop(0, 'rgba(6, 182, 212, 0)');
+        scanGrad.addColorStop(0.8, 'rgba(6, 182, 212, 0.35)');
+        scanGrad.addColorStop(1, 'rgba(56, 189, 248, 0.85)');
+        ctx.fillStyle = scanGrad;
+        ctx.fillRect(40, scanY - 4, 570, 4);
+
+        for (let c = 0; c < 5; c++) {
+          const cx = 110 + c * 105;
+          const cy = ((now * 170 + c * 180) % 700) + 120;
+          ctx.fillStyle = '#38BDF8';
+          ctx.shadowColor = '#06B6D4';
+          ctx.shadowBlur = 8;
+          ctx.fillRect(cx - 3, cy - 3, 6, 6);
+        }
+        ctx.restore();
       } else if (stageConfig.theme === 'yokai') {
-        // Yokai Apocalypse: Fiery magma fissures & volcanic embers
-        ctx.fillStyle = '#140402';
-        ctx.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
+        // Stage 5 YOKAI ONI: Magma fissure heat glow & rising hellfire embers
+        ctx.save();
+        const magmaGrad = ctx.createLinearGradient(0, 780, 0, 960);
+        magmaGrad.addColorStop(0, 'rgba(234, 88, 12, 0)');
+        magmaGrad.addColorStop(1, 'rgba(239, 68, 68, 0.45)');
+        ctx.fillStyle = magmaGrad;
+        ctx.fillRect(35, 780, 585, 180);
 
-        // Volcanic fissure cracks
-        ctx.strokeStyle = 'rgba(234, 88, 12, 0.35)';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(350, 100);
-        ctx.lineTo(330, 280);
-        ctx.lineTo(380, 420);
-        ctx.lineTo(320, 600);
-        ctx.lineTo(360, 800);
-        ctx.stroke();
-
-        ctx.strokeStyle = 'rgba(251, 191, 36, 0.5)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
+        for (let e = 0; e < 16; e++) {
+          const ex = 80 + ((e * 40 + Math.sin(now * 2 + e) * 35) % 480);
+          const ey = 900 - ((now * 80 + e * 70) % 680);
+          const eAlpha = 0.3 + 0.5 * Math.sin(now * 4 + e);
+          ctx.fillStyle = e % 3 === 0 ? `rgba(168, 85, 247, ${Math.max(0, eAlpha)})` : `rgba(249, 115, 22, ${Math.max(0, eAlpha)})`;
+          ctx.beginPath();
+          ctx.arc(ex, ey, 3 + (e % 3), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
       }
+
+      // Top Stage Mission Pill Overlay
+      ctx.save();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.strokeStyle = stageConfig.accentColor;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(100, 24, 460, 26, 13);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`🎯 ${stageConfig.stageMission}`, 330, 37);
+      ctx.restore();
 
       // 2. Draw Top Rollover Lanes (A - B - C)
       rollovers.forEach((lane) => {

@@ -13,6 +13,7 @@ import {
   createDropTargetsForStage,
   createSlingshotsForStage,
   createRolloverLanesForStage,
+  createWallsForStage,
   createTableWalls,
   getStageConfig,
   STAGES,
@@ -59,6 +60,10 @@ export default function App() {
     tiltWarnings: 0,
     isTilted: false,
     skillShotReady: true,
+    infiniteLives: false,
+    stageMission: STAGES[0].stageMission,
+    missionProgress: '0%',
+    missionCompleted: false,
     mascotMood: 'IDLE',
     mascotMessage: 'READY! SHOOT FOR HIGHSCORE!',
     mascotTimer: 0,
@@ -86,25 +91,45 @@ export default function App() {
     setStats((prev) => ({ ...prev, highScore }));
   }, [highScore]);
 
-  // Stage Switcher Function (Can be triggered manually by button or automatically by score threshold)
+  // Stage Switcher Function: Resets ball, loads stage-specific geometry, sound, and mission
   const handleSelectStage = useCallback((stageId: number) => {
     const cfg = getStageConfig(stageId);
     
-    // Update playfield components with stage specific geometry and formatting
+    // 1. Reset ball to plunger lane for a fresh clean launch in the new stage
+    const physics = physicsRef.current;
+    physics.balls = [];
+    physics.spawnBall(642, 860, 0, 0);
+    physics.plungerTension = 0;
+    physics.isPlungerCharging = false;
+    setPlungerPower(0);
+
+    // 2. Update playfield components with stage-specific geometry, walls, and bumpers
+    wallsRef.current = createWallsForStage(stageId);
     bumpersRef.current = createBumpersForStage(stageId);
     dropTargetsRef.current = createDropTargetsForStage(stageId);
     slingshotsRef.current = createSlingshotsForStage(stageId);
     rolloversRef.current = createRolloverLanesForStage(stageId);
 
-    // Audio and particle fanfare
+    // 3. Audio transition to stage-specific soundtrack & celebratory fanfare
+    soundEngine.setStage(stageId);
     soundEngine.playStageClear();
-    physicsRef.current.triggerStageClearExplosion(cfg.accentColor);
-    physicsRef.current.addPopup(`★ ${cfg.name} ★`, TABLE_WIDTH / 2, 260, cfg.accentColor);
+    physics.triggerStageClearExplosion(cfg.accentColor);
+    physics.addPopup(`★ ${cfg.name} ★`, TABLE_WIDTH / 2, 260, cfg.accentColor);
 
+    // 4. Reset stage mission, combo, multiball, and update stats
     const updated: GameStats = {
       ...statsRef.current,
       currentStage: stageId,
       nextStageThreshold: cfg.scoreThreshold,
+      stageMission: cfg.stageMission,
+      missionProgress: '0%',
+      missionCompleted: false,
+      isMultiball: false,
+      lockedBalls: 0,
+      comboCount: 0,
+      skillShotReady: true,
+      isTilted: false,
+      tiltWarnings: 0,
       mascotMood: 'HAPPY',
       mascotMessage: cfg.mascotQuotes.start,
       mascotTimer: 3.5,
@@ -116,6 +141,15 @@ export default function App() {
     setStats(updated);
   }, []);
 
+  // Infinite Lives Toggle Handler (For testing & casual play)
+  const handleToggleInfiniteLives = useCallback(() => {
+    setStats((prev) => {
+      const next = !prev.infiniteLives;
+      statsRef.current.infiniteLives = next;
+      return { ...prev, infiniteLives: next };
+    });
+  }, []);
+
   // Start New Game
   const startNewGame = useCallback(() => {
     const physics = physicsRef.current;
@@ -125,11 +159,13 @@ export default function App() {
     physics.cameraShake = 0;
     physics.plungerTension = 0;
     physics.isPlungerCharging = false;
+    setPlungerPower(0);
 
     // Reset flippers & components to stage 1
     const initFlippers = createInitialFlippers();
     leftFlipperRef.current = initFlippers.left;
     rightFlipperRef.current = initFlippers.right;
+    wallsRef.current = createWallsForStage(1);
     bumpersRef.current = createBumpersForStage(1);
     dropTargetsRef.current = createDropTargetsForStage(1);
     slingshotsRef.current = createSlingshotsForStage(1);
@@ -153,6 +189,10 @@ export default function App() {
       tiltWarnings: 0,
       isTilted: false,
       skillShotReady: true,
+      infiniteLives: statsRef.current?.infiniteLives || false,
+      stageMission: STAGES[0].stageMission,
+      missionProgress: '0%',
+      missionCompleted: false,
       mascotMood: 'IDLE',
       mascotMessage: 'BOLA 1 PRONTA! PUXE A MOLA!',
       mascotTimer: 2.5,
@@ -164,6 +204,7 @@ export default function App() {
     statsRef.current = initialStats;
     setGameState('PLAYING');
 
+    soundEngine.setStage(1);
     if (isMusicEnabled) {
       soundEngine.startMusicLoop();
     }
@@ -373,7 +414,17 @@ export default function App() {
         } else {
           // Standard ball drained
           soundEngine.playDrain();
-          if (currentStats.ballNumber < currentStats.maxBalls) {
+          if (currentStats.infiniteLives) {
+            // Infinite Lives Active: respawn ball without deducting life or ending game
+            currentStats.multiplier = 1;
+            currentStats.isTilted = false;
+            currentStats.tiltWarnings = 0;
+            currentStats.mascotMood = 'HAPPY';
+            currentStats.mascotMessage = '♾️ VIDAS INFINITAS ATIVAS! BOLA RECOLOCADA!';
+            currentStats.mascotTimer = 2.0;
+
+            physics.spawnBall(642, 860, 0, 0);
+          } else if (currentStats.ballNumber < currentStats.maxBalls) {
             currentStats.ballNumber++;
             currentStats.multiplier = 1;
             currentStats.isTilted = false;
@@ -476,6 +527,7 @@ export default function App() {
               onToggleMute={handleToggleMute}
               onToggleMusic={handleToggleMusic}
               onToggleCrt={handleToggleCrt}
+              onToggleInfiniteLives={handleToggleInfiniteLives}
             />
           </div>
         </div>

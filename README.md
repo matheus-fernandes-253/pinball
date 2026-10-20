@@ -32,12 +32,15 @@ Todas as imagens do jogo ficam localizadas na pasta:
 ### Arquivos de Imagens Atuais:
 | Arquivo Atual | Uso no Jogo | Onde Alterar no Código |
 | :--- | :--- | :--- |
-| `pinball_playfield_art_1792073461455.jpg` | **Fundo da Mesa (Playfield)** | `src/components/PinballCanvas.tsx` (linha ~50) |
-| `anime_backglass_heroine_1792073461707.jpg` | **Fase 1: Neon Arcade** (Sakura) | `src/game/tableLayout.ts` no `STAGES[0]` |
-| `jhorror_backglass_art_1792338949512.jpg` | **Fase 2: J-Horror School** (Reiko) | `src/game/tableLayout.ts` no `STAGES[1]` |
-| `samurai_backglass_art_1792338949761.jpg` | **Fase 3: Samurai Sakura** (Tomoe) | `src/game/tableLayout.ts` no `STAGES[2]` |
-| `shinobi_backglass_art_1792338951047.jpg` | **Fase 4: Mecha Shinobi** (Kasumi) | `src/game/tableLayout.ts` no `STAGES[3]` |
-| `yokai_backglass_art_1792338965836.jpg` | **Fase 5: Yokai Oni** (Akane) | `src/game/tableLayout.ts` no `STAGES[4]` |
+| `beach_anime_pixelart_1792443936790.jpg` | **Fase 1: Beach Bikini Arcade** (Mesa e Backglass) | `src/game/tableLayout.ts` no `STAGES[0]` |
+| `jhorror_playfield_1792458808970.jpg` | **Fase 2: J-Horror School** (Fundo da Mesa) | `src/game/tableLayout.ts` no `STAGES[1]` |
+| `jhorror_backglass_art_1792338949512.jpg` | **Fase 2: J-Horror School** (Backglass Reiko) | `src/game/tableLayout.ts` no `STAGES[1]` |
+| `samurai_playfield_1792458810307.jpg` | **Fase 3: Samurai Sakura** (Fundo da Mesa) | `src/game/tableLayout.ts` no `STAGES[2]` |
+| `samurai_backglass_art_1792338949761.jpg` | **Fase 3: Samurai Sakura** (Backglass Tomoe) | `src/game/tableLayout.ts` no `STAGES[2]` |
+| `shinobi_playfield_1792458809537.jpg` | **Fase 4: Mecha Shinobi** (Fundo da Mesa) | `src/game/tableLayout.ts` no `STAGES[3]` |
+| `shinobi_backglass_art_1792338951047.jpg` | **Fase 4: Mecha Shinobi** (Backglass Kasumi) | `src/game/tableLayout.ts` no `STAGES[3]` |
+| `yokai_playfield_1792458809655.jpg` | **Fase 5: Yokai Oni** (Fundo da Mesa) | `src/game/tableLayout.ts` no `STAGES[4]` |
+| `yokai_backglass_art_1792338965836.jpg` | **Fase 5: Yokai Oni** (Backglass Akane) | `src/game/tableLayout.ts` no `STAGES[4]` |
 
 ---
 
